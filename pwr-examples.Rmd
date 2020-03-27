@@ -1,0 +1,219 @@
+---
+title: "`pwr` Package Primer"
+author: "Shih Ching Fu"
+date: "March 2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    number_sections: true
+    theme: readable
+    highlight: haddock
+    code_folding: show
+---
+
+# Introduction
+
+This is a brief guide to using the `pwr`[^pwr] package by way of a few examples.
+
+Recall that for a statistical test the following factors are inter-related:
+
+1. The desired level of significance, $\alpha$ = P(Type I error)
+2. The power of the test, (1 - $\beta$) = 1 - P(Type II error)
+3. The sample size, $n$
+4. The minimal effect size of interest
+5. The variance in the response variable
+
+Thus knowing any four factors will provide an estimate for the remaining fifth factor.
+
+In base `R` the `stats` package has some functions for calculating power, namely: `power.t.test()`, `power.prop.test()`, and `power.anova.test()`. The `pwr` package provides substitutes for these functions plus more.
+
+
+## `pwr` package
+
+The `pwr` package includes various functions useful for power calculations. The first four below overlap with the abovementioned base `R` functions:
+
+1. `pwr.t.test()` 1-, 2-sample, and paired t-test
+2. `pwr.t2n.test()` 2-sample t-test
+3. `pwr.2p.test()` 2-sample test of proportions (equal size)
+4. `pwr.anova.test()` balanced 1-way ANOVA
+5. `pwr.2p2n.test()` 2-sample test of proportions (unequal size)
+6. `pwr.p.test()` 1-sample test of proportions
+7. `pwr.r.test()` correlation test
+8. `pwr.chisq.test()` chi-squared goodness of fit or association test
+9. `pwr.f2.test()` test of linear model coefficients
+
+One difference between base and `pwr` functions is that the latter generally take a standardised (Cohen[^cohen]) effect size as argument rather than sample statistics such as proportions, means, or variances.
+
+The `pwr` package vignette can be found on [CRAN](https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html).
+
+Install the package using the `install.packages()` command:
+
+```{r eval=FALSE}
+install.packages("pwr")
+```
+
+# Examples
+
+## Multiple linear regression
+
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_p x_p$$
+
+The null hypothesis is that none of the $p$ explanatory variables $x_i$ explain any of the variability in the response variable $y$. This would mean their regression coefficients, $\beta_i$, are all statistically indistinguishable from zero.
+
+The alternative is that at least one of the coefficients is not 0. 
+
+$H_0: \beta_i = 0, \quad \forall i = 1, 2, \dots, p.$
+
+$H_A: \textrm{At least one}\; \beta_i \ne 0,\; \textrm{for}\;i = 1, 2, \dots, p.$
+
+
+
+```{r setup}
+# Load pwr package
+library(pwr)
+```
+
+The `pwr` function for calculating sample sizes for multiple linear regression is `pwr.f2.test()`.
+
+```{r}
+# List the arguments to the pwr.f2.test() function
+args(pwr.f2.test)
+```
+
+The (numerator) degrees of freedom, $u$, is the number of coefficients you have in your model. 
+
+The (denominator) degrees of freedom, $v$, is the number of error degrees of freedom $v = n − u − 1$. Rearranging gives an expression for sample size $n = v + u + 1$ (always rounding _up_ to the next integer).
+
+The effect size $f^2 = \frac{R^2}{1−R^2}$, where $R^2$ is the coefficient of determination, otherwise understood as the proportion of variance explained by the multiple regression model. 
+
+### Determining effect size $f^2$
+
+One way to determine the effect size parameter is by first hypothesising an $R^2$ value, i.e., the proportion of variance that the model will explain.
+
+For example, if we have
+
+- six explanatory variables, 
+- significance level of $\alpha = 5\%$, 
+- power of $1 - \beta = 0.8$, and 
+- $R^2 = 20\%$ which gives $f^2 = \frac{0.2}{1 - 0.2} = 0.25$,
+
+using `R` we get:
+
+```{r}
+pwr.f2.test(u = 6, 
+            f2 = 0.2/(1 - 0.2), 
+            sig.level = 0.05, 
+            power = 0.8)
+```
+
+where from $v$ we can calculate the sample size $n = v + u + 1 = 55 + 6 + 1 = 62$. 
+
+### Cohen's suggested $f^2$ values
+
+Alternatively, Cohen (1982)[^cohen] suggests that $f^2$ values of 0.02, 0.15, and 0.35 represent small, medium, and large effect sizes respectively.
+
+These are convenient stored in the `pwr` package and retrieved using the `cohen.ES()` function:
+
+```{r}
+# Retrieve Cohen's suggested effect sizes
+cohen.ES(test = "f2", size = "small")
+cohen.ES(test = "f2", size = "medium")
+cohen.ES(test = "f2", size = "large")
+```
+
+Therefore if we have 
+
+- six explanatory variables, 
+- significance level of $\alpha = 5\%$, 
+- power of $1 - \beta = 0.8$, and 
+- $f^2 = 0.35$ (large effect size)
+
+then
+
+```{r}
+pwr.f2.test(u = 6, 
+            f2 = 0.35, 
+            sig.level = 0.05, 
+            power = 0.8)
+```
+
+From $v$ we calculate the sample size $n = v + u + 1 = 39 + 6 + 1 = 46$.
+
+
+## Balanced ANOVA
+
+For ANOVA where each group has the same number of samples, i.e., _balanced_.
+
+Null hypothesis is that the means of each group are all the same.
+
+Alternative hypothesis is that the mean of at least one group is significantly different.
+
+$H_0: \mu_1 = \mu_2 = \dots = \mu_k$
+
+$H_A: \textrm{at least one}\; \mu_i\; \textrm{is different from the others}$
+
+
+```{r}
+# If we want to detect even a small difference
+cohen.ES(test = "anov", size = "small")
+```
+
+Therefore if we have 
+
+- $k = 3$ groups,
+- significance level of $\alpha = 5\%$, 
+- power of $1 - \beta = 0.8$, and 
+- $f = 0.1$ (small effect size)
+
+```{r}
+pwr.anova.test(k = 3, 
+               f = 0.1, 
+               sig.level = 0.05, 
+               power = 0.8)
+```
+
+Sample size of 969 is needed: 323 in each group.
+
+
+## Two-sample t-Test
+
+For a two-sample t-test where each group has the same number of samples, the null hypothesis is that the means of both groups are all the same.
+
+Alternative hypothesis is that the mean of group 2 is larger.
+
+$H_0: \mu_1 = \mu_2$
+
+$H_A: \mu_1 < \mu_2$
+
+
+```{r}
+# Looking for a large effect size
+cohen.ES(test = "t", size = "large")
+```
+
+```{r}
+pwr.t.test(d = 0.8, 
+           power = 0.80, 
+           sig.level = 0.05, 
+           alternative = "greater")
+```
+
+The same sample size is returned $n = 21 \times 2 = 42$.
+
+
+```{r}
+# Compare result with built-in R function
+power.t.test(n = 20, 
+             sd = 1, 
+             sig.level = 0.05, 
+             power = 0.8, 
+             alternative = "one")
+```
+
+[^pwr]: [`pwr`](https://cran.r-project.org/web/packages/pwr/) package
+
+[^cohen]: Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Hillsdale, NJ: Lawrence Erlbaum.
