@@ -1,6 +1,6 @@
 ---
 title: "`pwr` Package Primer"
-author: "[Shih Ching Fu](https://shihchingfu.com"
+author: "[Shih Ching Fu](https://shihchingfu.com)"
 date: "March 2020"
 output:
   html_document:
