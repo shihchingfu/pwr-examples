@@ -1335,13 +1335,26 @@ window.initializeCodeFolding = function(show) {
 
 }
 </script>
+<script>
+window.initializeSourceEmbed = function(filename) {
+  $("#rmd-download-source").click(function() {
+    var src = $("#rmd-source-code").html();
+    var a = document.createElement('a');
+    a.href = "data:text/x-r-markdown;base64," + src;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+};
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -1351,14 +1364,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -1367,9 +1382,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; } /* Alert */
 code span.an { color: #008000; } /* Annotation */
@@ -1458,6 +1473,9 @@ h6 {
 }
 .table th:not([align]) {
   text-align: left;
+}
+#rmd-source-code {
+  display: none;
 }
 </style>
 
@@ -1648,6 +1666,8 @@ div.tocify {
 <ul class="dropdown-menu" style="min-width: 50px;">
 <li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
 <li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
 </ul>
 </div>
 
@@ -1696,9 +1716,9 @@ div.tocify {
 <p>One difference between the base <code>stats</code> and the <code>pwr</code> functions is that the latter generally expects standardised (Cohen<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>) effect sizes as an argument rather than sample statistics such as proportions, means, or variances.</p>
 <p>More detailed documentation on the <code>pwr</code> package can be found in its vignette on <a href="https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html">CRAN</a>.</p>
 <p>Install the <code>pwr</code> package using the <code>install.packages()</code> command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;pwr&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># Load the pwr package</span></a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="kw">library</span>(pwr)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;pwr&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Load the pwr package</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">library</span>(pwr)</span></code></pre></div>
 </div>
 </div>
 <div id="examples" class="section level1">
@@ -1712,8 +1732,8 @@ div.tocify {
 <p><span class="math inline">\(H_0: \beta_i = 0, \quad \forall i = 1, 2, \dots, p.\)</span></p>
 <p><span class="math inline">\(H_A: \textrm{At least one}\; \beta_i \ne 0,\; \textrm{for}\;i = 1, 2, \dots, p.\)</span></p>
 <p>The <code>pwr</code> function for calculating sample sizes for multiple linear regression is <code>pwr.f2.test()</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># List the arguments to the pwr.f2.test() function</span></a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="kw">args</span>(pwr.f2.test)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># List the arguments to the pwr.f2.test() function</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">args</span>(pwr.f2.test)</span></code></pre></div>
 <pre><code>## function (u = NULL, v = NULL, f2 = NULL, sig.level = 0.05, power = NULL) 
 ## NULL</code></pre>
 <p>The (numerator) degrees of freedom, <span class="math inline">\(u\)</span>, is the number of coefficients you have in your model.</p>
@@ -1730,10 +1750,10 @@ div.tocify {
 <li>power of <span class="math inline">\(1 - \beta = 0.8\)</span>,</li>
 </ul>
 <p>then passing these to the <code>pwr.f2.test()</code> function:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">pwr.f2.test</span>(<span class="dt">u =</span> <span class="dv">6</span>, </a>
-<a class="sourceLine" id="cb5-2" title="2">            <span class="dt">f2 =</span> <span class="fl">0.2</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.2</span>), </a>
-<a class="sourceLine" id="cb5-3" title="3">            <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </a>
-<a class="sourceLine" id="cb5-4" title="4">            <span class="dt">power =</span> <span class="fl">0.8</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">pwr.f2.test</span>(<span class="dt">u =</span> <span class="dv">6</span>, </span>
+<span id="cb5-2"><a href="#cb5-2"></a>            <span class="dt">f2 =</span> <span class="fl">0.2</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.2</span>), </span>
+<span id="cb5-3"><a href="#cb5-3"></a>            <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </span>
+<span id="cb5-4"><a href="#cb5-4"></a>            <span class="dt">power =</span> <span class="fl">0.8</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Multiple regression power calculation 
 ## 
@@ -1749,22 +1769,22 @@ div.tocify {
 <h3><span class="header-section-number">2.1.2</span> Cohen’s suggested <span class="math inline">\(f^2\)</span> values</h3>
 <p>Alternatively, Cohen (1982)<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> suggests that <span class="math inline">\(f^2\)</span> values of 0.02, 0.15, and 0.35 represent small, medium, and large effect sizes respectively.</p>
 <p>These values are conveniently stored in the <code>pwr</code> package and retrieved using the <code>cohen.ES()</code> function:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># Retrieve Cohen&#39;s suggested effect sizes</span></a>
-<a class="sourceLine" id="cb7-2" title="2"><span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;f2&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;small&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Retrieve Cohen&#39;s suggested effect sizes</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;f2&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;small&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Conventional effect size from Cohen (1982) 
 ## 
 ##            test = f2
 ##            size = small
 ##     effect.size = 0.02</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;f2&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;medium&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;f2&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;medium&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Conventional effect size from Cohen (1982) 
 ## 
 ##            test = f2
 ##            size = medium
 ##     effect.size = 0.15</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;f2&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;large&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;f2&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;large&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Conventional effect size from Cohen (1982) 
 ## 
@@ -1778,10 +1798,10 @@ div.tocify {
 <li>significance level of <span class="math inline">\(\alpha = 5\%\)</span>, and</li>
 <li>power of <span class="math inline">\(1 - \beta = 0.8\)</span>.</li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">pwr.f2.test</span>(<span class="dt">u =</span> <span class="dv">6</span>, </a>
-<a class="sourceLine" id="cb13-2" title="2">            <span class="dt">f2 =</span> <span class="fl">0.35</span>, </a>
-<a class="sourceLine" id="cb13-3" title="3">            <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </a>
-<a class="sourceLine" id="cb13-4" title="4">            <span class="dt">power =</span> <span class="fl">0.8</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">pwr.f2.test</span>(<span class="dt">u =</span> <span class="dv">6</span>, </span>
+<span id="cb13-2"><a href="#cb13-2"></a>            <span class="dt">f2 =</span> <span class="fl">0.35</span>, </span>
+<span id="cb13-3"><a href="#cb13-3"></a>            <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </span>
+<span id="cb13-4"><a href="#cb13-4"></a>            <span class="dt">power =</span> <span class="fl">0.8</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Multiple regression power calculation 
 ## 
@@ -1800,8 +1820,8 @@ div.tocify {
 <p>Alternative hypothesis is that the mean of at least one group is significantly different.</p>
 <p><span class="math inline">\(H_0: \mu_1 = \mu_2 = \dots = \mu_k\)</span></p>
 <p><span class="math inline">\(H_A: \textrm{at least one}\; \mu_i\; \textrm{is different from the others}\)</span></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># If we want to detect even a small difference</span></a>
-<a class="sourceLine" id="cb15-2" title="2"><span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;anov&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;small&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># If we want to detect even a small difference</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;anov&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;small&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Conventional effect size from Cohen (1982) 
 ## 
@@ -1815,10 +1835,10 @@ div.tocify {
 <li>significance level of <span class="math inline">\(\alpha = 5\%\)</span>, and</li>
 <li>power of <span class="math inline">\(1 - \beta = 0.8\)</span>.</li>
 </ul>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw">pwr.anova.test</span>(<span class="dt">k =</span> <span class="dv">3</span>, </a>
-<a class="sourceLine" id="cb17-2" title="2">               <span class="dt">f =</span> <span class="fl">0.1</span>, </a>
-<a class="sourceLine" id="cb17-3" title="3">               <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </a>
-<a class="sourceLine" id="cb17-4" title="4">               <span class="dt">power =</span> <span class="fl">0.8</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">pwr.anova.test</span>(<span class="dt">k =</span> <span class="dv">3</span>, </span>
+<span id="cb17-2"><a href="#cb17-2"></a>               <span class="dt">f =</span> <span class="fl">0.1</span>, </span>
+<span id="cb17-3"><a href="#cb17-3"></a>               <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </span>
+<span id="cb17-4"><a href="#cb17-4"></a>               <span class="dt">power =</span> <span class="fl">0.8</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Balanced one-way analysis of variance power calculation 
 ## 
@@ -1837,11 +1857,11 @@ div.tocify {
 <p>The alternative hypothesis is that the mean of group 2 is larger.</p>
 <p><span class="math inline">\(H_0: \mu_1 = \mu_2\)</span></p>
 <p><span class="math inline">\(H_A: \mu_1 &lt; \mu_2\)</span></p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co"># Looking for a large effect size</span></a>
-<a class="sourceLine" id="cb19-2" title="2"><span class="kw">pwr.t.test</span>(<span class="dt">d =</span> <span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;t&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;large&quot;</span>)<span class="op">$</span>effect.size, </a>
-<a class="sourceLine" id="cb19-3" title="3">           <span class="dt">power =</span> <span class="fl">0.80</span>, </a>
-<a class="sourceLine" id="cb19-4" title="4">           <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </a>
-<a class="sourceLine" id="cb19-5" title="5">           <span class="dt">alternative =</span> <span class="st">&quot;greater&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Looking for a large effect size</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="kw">pwr.t.test</span>(<span class="dt">d =</span> <span class="kw">cohen.ES</span>(<span class="dt">test =</span> <span class="st">&quot;t&quot;</span>, <span class="dt">size =</span> <span class="st">&quot;large&quot;</span>)<span class="op">$</span>effect.size, </span>
+<span id="cb19-3"><a href="#cb19-3"></a>           <span class="dt">power =</span> <span class="fl">0.80</span>, </span>
+<span id="cb19-4"><a href="#cb19-4"></a>           <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </span>
+<span id="cb19-5"><a href="#cb19-5"></a>           <span class="dt">alternative =</span> <span class="st">&quot;greater&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Two-sample t test power calculation 
 ## 
@@ -1853,12 +1873,12 @@ div.tocify {
 ## 
 ## NOTE: n is number in *each* group</code></pre>
 <p>The required sample size is <span class="math inline">\(n = 21 \times 2 = 42\)</span>.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co"># Compare result with built-in R function</span></a>
-<a class="sourceLine" id="cb21-2" title="2"><span class="kw">power.t.test</span>(<span class="dt">n =</span> <span class="dv">20</span>, </a>
-<a class="sourceLine" id="cb21-3" title="3">             <span class="dt">sd =</span> <span class="dv">1</span>, </a>
-<a class="sourceLine" id="cb21-4" title="4">             <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </a>
-<a class="sourceLine" id="cb21-5" title="5">             <span class="dt">power =</span> <span class="fl">0.8</span>, </a>
-<a class="sourceLine" id="cb21-6" title="6">             <span class="dt">alternative =</span> <span class="st">&quot;one&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># Compare result with built-in R function</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="kw">power.t.test</span>(<span class="dt">n =</span> <span class="dv">20</span>, </span>
+<span id="cb21-3"><a href="#cb21-3"></a>             <span class="dt">sd =</span> <span class="dv">1</span>, </span>
+<span id="cb21-4"><a href="#cb21-4"></a>             <span class="dt">sig.level =</span> <span class="fl">0.05</span>, </span>
+<span id="cb21-5"><a href="#cb21-5"></a>             <span class="dt">power =</span> <span class="fl">0.8</span>, </span>
+<span id="cb21-6"><a href="#cb21-6"></a>             <span class="dt">alternative =</span> <span class="st">&quot;one&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Two-sample t test power calculation 
 ## 
@@ -1876,12 +1896,13 @@ div.tocify {
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="https://cran.r-project.org/web/packages/pwr/"><code>pwr</code></a> package<a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p>Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Hillsdale, NJ: Lawrence Erlbaum.<a href="#fnref2" class="footnote-back">↩</a></p></li>
-<li id="fn3"><p>Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Hillsdale, NJ: Lawrence Erlbaum.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p><a href="https://cran.r-project.org/web/packages/pwr/"><code>pwr</code></a> package<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Hillsdale, NJ: Lawrence Erlbaum.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Hillsdale, NJ: Lawrence Erlbaum.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 
+<div id="rmd-source-code">LS0tDQp0aXRsZTogImBwd3JgIFBhY2thZ2UgUHJpbWVyIg0KYXV0aG9yOiAiW1NoaWggQ2hpbmcgRnVdKGh0dHBzOi8vc2hpaGNoaW5nZnUuY29tKSINCmRhdGU6ICJNYXJjaCAyMDIwIg0Kb3V0cHV0Og0KICBodG1sX2RvY3VtZW50Og0KICAgIHRvYzogdHJ1ZQ0KICAgIHRvY19kZXB0aDogMw0KICAgIHRvY19mbG9hdDogDQogICAgICBjb2xsYXBzZWQ6IHRydWUNCiAgICAgIHNtb290aF9zY3JvbGw6IHRydWUNCiAgICBudW1iZXJfc2VjdGlvbnM6IHRydWUNCiAgICB0aGVtZTogcmVhZGFibGUNCiAgICBoaWdobGlnaHQ6IGhhZGRvY2sNCiAgICBjb2RlX2ZvbGRpbmc6IHNob3cNCiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlDQprbml0OiANCiAgKGZ1bmN0aW9uKGlucHV0X2ZpbGUsIGVuY29kaW5nKSB7DQogICAgcm1hcmtkb3duOjpyZW5kZXIoaW5wdXRfZmlsZSwNCiAgICAgICAgICAgICAgICAgICAgICBlbmNvZGluZz1lbmNvZGluZywNCiAgICAgICAgICAgICAgICAgICAgICBvdXRwdXRfZmlsZT1maWxlLnBhdGgoZGlybmFtZShpbnB1dF9maWxlKSwgJ2RvY3MnLCAnaW5kZXguaHRtbCcpKX0pDQotLS0NCg0KIyBJbnRyb2R1Y3Rpb24NCg0KVGhpcyBpcyBhIGJyaWVmIGd1aWRlIHRvIHVzaW5nIHRoZSBgcHdyYFtecHdyXSBwYWNrYWdlIGJ5IHdheSBvZiBhIGZldyBleGFtcGxlcy4NCg0KUmVjYWxsIHRoYXQgZm9yIGEgc3RhdGlzdGljYWwgdGVzdCB0aGUgZm9sbG93aW5nIGZhY3RvcnMgYXJlIGludGVyLXJlbGF0ZWQ6DQoNCjEuIFRoZSBkZXNpcmVkIGxldmVsIG9mIHNpZ25pZmljYW5jZSwgJFxhbHBoYSQgPSBQKFR5cGUgSSBlcnJvcikNCjIuIFRoZSBwb3dlciBvZiB0aGUgdGVzdCwgKDEgLSAkXGJldGEkKSA9IDEgLSBQKFR5cGUgSUkgZXJyb3IpDQozLiBUaGUgc2FtcGxlIHNpemUsICRuJA0KNC4gVGhlIG1pbmltYWwgZWZmZWN0IHNpemUgb2YgaW50ZXJlc3QNCjUuIFRoZSB2YXJpYW5jZSBpbiB0aGUgcmVzcG9uc2UgdmFyaWFibGUNCg0KVGh1cyBrbm93aW5nIGFueSBmb3VyIGZhY3RvcnMgd2lsbCBwcm92aWRlIGFuIGVzdGltYXRlIGZvciB0aGUgcmVtYWluaW5nIGZpZnRoIGZhY3Rvci4NCg0KSW4gYmFzZSBgUmAgdGhlIGBzdGF0c2AgcGFja2FnZSBoYXMgc29tZSBmdW5jdGlvbnMgZm9yIGNhbGN1bGF0aW5nIHBvd2VyLCBuYW1lbHk6IA0KDQotIGBwb3dlci50LnRlc3QoKWAsIA0KLSBgcG93ZXIucHJvcC50ZXN0KClgLCBhbmQgDQotIGBwb3dlci5hbm92YS50ZXN0KClgLiANCg0KVGhlIGBwd3JgIHBhY2thZ2UgaW5jbHVkZXMgc3Vic3RpdHV0ZXMgZm9yIHRoZXNlIGZ1bmN0aW9ucyBwbHVzIGEgZmV3IG1vcmUuDQoNCg0KIyMgYHB3cmAgcGFja2FnZQ0KDQpUaGUgYHB3cmAgcGFja2FnZSBoYXMgdmFyaW91cyBmdW5jdGlvbnMgdXNlZnVsIGZvciBwb3dlciBjYWxjdWxhdGlvbnMuIFRoZSBmaXJzdCBmb3VyIGJlbG93IG92ZXJsYXAgd2l0aCB0aGUgYWJvdmUtbWVudGlvbmVkIGBzdGF0c2AgcGFja2FnZSBmdW5jdGlvbnM6DQoNCjEuIGBwd3IudC50ZXN0KClgIDEtLCAyLXNhbXBsZSwgYW5kIHBhaXJlZCB0LXRlc3QNCjIuIGBwd3IudDJuLnRlc3QoKWAgMi1zYW1wbGUgdC10ZXN0DQozLiBgcHdyLjJwLnRlc3QoKWAgMi1zYW1wbGUgdGVzdCBvZiBwcm9wb3J0aW9ucyAoZXF1YWwgc2l6ZSkNCjQuIGBwd3IuYW5vdmEudGVzdCgpYCBiYWxhbmNlZCAxLXdheSBBTk9WQQ0KNS4gYHB3ci4ycDJuLnRlc3QoKWAgMi1zYW1wbGUgdGVzdCBvZiBwcm9wb3J0aW9ucyAodW5lcXVhbCBzaXplKQ0KNi4gYHB3ci5wLnRlc3QoKWAgMS1zYW1wbGUgdGVzdCBvZiBwcm9wb3J0aW9ucw0KNy4gYHB3ci5yLnRlc3QoKWAgY29ycmVsYXRpb24gdGVzdA0KOC4gYHB3ci5jaGlzcS50ZXN0KClgIGNoaS1zcXVhcmVkIGdvb2RuZXNzIG9mIGZpdCBvciBhc3NvY2lhdGlvbiB0ZXN0DQo5LiBgcHdyLmYyLnRlc3QoKWAgdGVzdCBvZiBsaW5lYXIgbW9kZWwgY29lZmZpY2llbnRzDQoNCk9uZSBkaWZmZXJlbmNlIGJldHdlZW4gdGhlIGJhc2UgYHN0YXRzYCBhbmQgdGhlIGBwd3JgIGZ1bmN0aW9ucyBpcyB0aGF0IHRoZSBsYXR0ZXIgZ2VuZXJhbGx5IGV4cGVjdHMgc3RhbmRhcmRpc2VkIChDb2hlblteY29oZW5dKSBlZmZlY3Qgc2l6ZXMgYXMgYW4gYXJndW1lbnQgcmF0aGVyIHRoYW4gc2FtcGxlIHN0YXRpc3RpY3Mgc3VjaCBhcyBwcm9wb3J0aW9ucywgbWVhbnMsIG9yIHZhcmlhbmNlcy4NCg0KTW9yZSBkZXRhaWxlZCBkb2N1bWVudGF0aW9uIG9uIHRoZSBgcHdyYCBwYWNrYWdlIGNhbiBiZSBmb3VuZCBpbiBpdHMgdmlnbmV0dGUgb24gW0NSQU5dKGh0dHBzOi8vY3Jhbi5yLXByb2plY3Qub3JnL3dlYi9wYWNrYWdlcy9wd3IvdmlnbmV0dGVzL3B3ci12aWduZXR0ZS5odG1sKS4NCg0KSW5zdGFsbCB0aGUgYHB3cmAgcGFja2FnZSB1c2luZyB0aGUgYGluc3RhbGwucGFja2FnZXMoKWAgY29tbWFuZDoNCg0KYGBge3IgZXZhbD1GQUxTRX0NCmluc3RhbGwucGFja2FnZXMoInB3ciIpDQpgYGANCg0KYGBge3J9DQojIExvYWQgdGhlIHB3ciBwYWNrYWdlDQpsaWJyYXJ5KHB3cikNCmBgYA0KDQojIEV4YW1wbGVzDQoNCiMjIE11bHRpcGxlIGxpbmVhciByZWdyZXNzaW9uDQoNClRoZSBtb2RlbCBmb3IgbXVsdGlwbGUgbGluZWFyIHJlZ3Jlc3Npb24gaXMgYXMgZm9sbG93czoNCg0KJCR5ID0gXGJldGFfMCArIFxiZXRhXzEgeF8xICsgXGJldGFfMiB4XzIgKyBcZG90cyArIFxiZXRhX3AgeF9wJCQNCg0KVGhlIG51bGwgaHlwb3RoZXNpcyBpcyB0aGF0IG5vbmUgb2YgdGhlICRwJCBleHBsYW5hdG9yeSB2YXJpYWJsZXMgJHhfaSQgZXhwbGFpbiBhbnkgb2YgdGhlIHZhcmlhYmlsaXR5IGluIHRoZSByZXNwb25zZSB2YXJpYWJsZSAkeSQuIFRoaXMgd291bGQgbWVhbiB0aGVpciByZWdyZXNzaW9uIGNvZWZmaWNpZW50cywgJFxiZXRhX2kkLCBhcmUgYWxsIHN0YXRpc3RpY2FsbHkgaW5kaXN0aW5ndWlzaGFibGUgZnJvbSB6ZXJvLg0KDQpUaGUgYWx0ZXJuYXRpdmUgaHlwb3RoZXNpcyBpcyB0aGF0ICphdCBsZWFzdCBvbmUqIG9mIHRoZSBjb2VmZmljaWVudHMgaXMgbm90IGVxdWFsIHRvIHplcm8uIA0KDQokSF8wOiBcYmV0YV9pID0gMCwgXHF1YWQgXGZvcmFsbCBpID0gMSwgMiwgXGRvdHMsIHAuJA0KDQokSF9BOiBcdGV4dHJte0F0IGxlYXN0IG9uZX1cOyBcYmV0YV9pIFxuZSAwLFw7IFx0ZXh0cm17Zm9yfVw7aSA9IDEsIDIsIFxkb3RzLCBwLiQNCg0KDQpUaGUgYHB3cmAgZnVuY3Rpb24gZm9yIGNhbGN1bGF0aW5nIHNhbXBsZSBzaXplcyBmb3IgbXVsdGlwbGUgbGluZWFyIHJlZ3Jlc3Npb24gaXMgYHB3ci5mMi50ZXN0KClgLg0KDQpgYGB7cn0NCiMgTGlzdCB0aGUgYXJndW1lbnRzIHRvIHRoZSBwd3IuZjIudGVzdCgpIGZ1bmN0aW9uDQphcmdzKHB3ci5mMi50ZXN0KQ0KYGBgDQoNClRoZSAobnVtZXJhdG9yKSBkZWdyZWVzIG9mIGZyZWVkb20sICR1JCwgaXMgdGhlIG51bWJlciBvZiBjb2VmZmljaWVudHMgeW91IGhhdmUgaW4geW91ciBtb2RlbC4gDQoNClRoZSAoZGVub21pbmF0b3IpIGRlZ3JlZXMgb2YgZnJlZWRvbSwgJHYkLCBpcyB0aGUgbnVtYmVyIG9mIGVycm9yIGRlZ3JlZXMgb2YgZnJlZWRvbSAkdiA9IG4g4oiSIHUg4oiSIDEkLiBSZWFycmFuZ2luZyBnaXZlcyBhbiBleHByZXNzaW9uIGZvciBzYW1wbGUgc2l6ZSAkbiA9IHYgKyB1ICsgMSQgKGFsd2F5cyByb3VuZGluZyBfdXBfIHRvIHRoZSBuZXh0IGludGVnZXIpLg0KDQpUaGUgZWZmZWN0IHNpemUgJGZeMiA9IFxmcmFje1JeMn17MeKIklJeMn0kLCB3aGVyZSAkUl4yJCBpcyB0aGUgY29lZmZpY2llbnQgb2YgZGV0ZXJtaW5hdGlvbiwgb3RoZXJ3aXNlIHVuZGVyc3Rvb2QgYXMgdGhlIHByb3BvcnRpb24gb2YgdmFyaWFuY2UgaW4gdGhlIHJlc3BvbnNlIHZhcmlhYmxlIGV4cGxhaW5lZCBieSB0aGUgbXVsdGlwbGUgcmVncmVzc2lvbiBtb2RlbC4gDQoNCiMjIyBEZXRlcm1pbmluZyBlZmZlY3Qgc2l6ZSAkZl4yJA0KDQpPbmUgd2F5IHRvIGRldGVybWluZSB0aGUgZWZmZWN0IHNpemUgcGFyYW1ldGVyIGlzIGJ5IGZpcnN0IGh5cG90aGVzaXNpbmcgYW4gJFJeMiQgdmFsdWUsIGkuZS4sIHRoZSBwcm9wb3J0aW9uIG9mIHZhcmlhbmNlIHRoYXQgdGhlIG1vZGVsIHdpbGwgZXhwbGFpbi4NCg0KRm9yIGV4YW1wbGUsIGlmIHdlIGhhdmU6DQoNCi0gc2l4IGV4cGxhbmF0b3J5IHZhcmlhYmxlcywgDQotICRSXjIgPSAyMFwlJCB3aGljaCBnaXZlcyAkZl4yID0gXGZyYWN7MC4yfXsxIC0gMC4yfSA9IDAuMjUkLA0KLSBzaWduaWZpY2FuY2UgbGV2ZWwgb2YgJFxhbHBoYSA9IDVcJSQsIGFuZA0KLSBwb3dlciBvZiAkMSAtIFxiZXRhID0gMC44JCwNCg0KdGhlbiBwYXNzaW5nIHRoZXNlIHRvIHRoZSBgcHdyLmYyLnRlc3QoKWAgZnVuY3Rpb246DQoNCmBgYHtyfQ0KcHdyLmYyLnRlc3QodSA9IDYsIA0KICAgICAgICAgICAgZjIgPSAwLjIvKDEgLSAwLjIpLCANCiAgICAgICAgICAgIHNpZy5sZXZlbCA9IDAuMDUsIA0KICAgICAgICAgICAgcG93ZXIgPSAwLjgpDQpgYGANCg0Kd2UgZ2V0IGEgJHYgPSA1NSQgKHJvdW5kaW5nIHVwKS4gDQoNCkZyb20gdGhpcyB3ZSBjYW4gY2FsY3VsYXRlIHRoZSBzYW1wbGUgc2l6ZTogJG4gPSB2ICsgdSArIDEgPSA1NSArIDYgKyAxID0gNjIkLiANCg0KIyMjIENvaGVuJ3Mgc3VnZ2VzdGVkICRmXjIkIHZhbHVlcw0KDQpBbHRlcm5hdGl2ZWx5LCBDb2hlbiAoMTk4MilbXmNvaGVuXSBzdWdnZXN0cyB0aGF0ICRmXjIkIHZhbHVlcyBvZiAwLjAyLCAwLjE1LCBhbmQgMC4zNSByZXByZXNlbnQgc21hbGwsIG1lZGl1bSwgYW5kIGxhcmdlIGVmZmVjdCBzaXplcyByZXNwZWN0aXZlbHkuDQoNClRoZXNlIHZhbHVlcyBhcmUgY29udmVuaWVudGx5IHN0b3JlZCBpbiB0aGUgYHB3cmAgcGFja2FnZSBhbmQgcmV0cmlldmVkIHVzaW5nIHRoZSBgY29oZW4uRVMoKWAgZnVuY3Rpb246DQoNCmBgYHtyfQ0KIyBSZXRyaWV2ZSBDb2hlbidzIHN1Z2dlc3RlZCBlZmZlY3Qgc2l6ZXMNCmNvaGVuLkVTKHRlc3QgPSAiZjIiLCBzaXplID0gInNtYWxsIikNCmNvaGVuLkVTKHRlc3QgPSAiZjIiLCBzaXplID0gIm1lZGl1bSIpDQpjb2hlbi5FUyh0ZXN0ID0gImYyIiwgc2l6ZSA9ICJsYXJnZSIpDQpgYGANCg0KVGhlcmVmb3JlIHdlIGhhdmU6IA0KDQotIHNpeCBleHBsYW5hdG9yeSB2YXJpYWJsZXMsIA0KLSAkZl4yID0gMC4zNSQgKGxhcmdlIGVmZmVjdCBzaXplKQ0KLSBzaWduaWZpY2FuY2UgbGV2ZWwgb2YgJFxhbHBoYSA9IDVcJSQsIGFuZA0KLSBwb3dlciBvZiAkMSAtIFxiZXRhID0gMC44JC4NCg0KDQpgYGB7cn0NCnB3ci5mMi50ZXN0KHUgPSA2LCANCiAgICAgICAgICAgIGYyID0gMC4zNSwgDQogICAgICAgICAgICBzaWcubGV2ZWwgPSAwLjA1LCANCiAgICAgICAgICAgIHBvd2VyID0gMC44KQ0KYGBgDQoNCkNhbGN1bGF0aW5nIHRoZSBzYW1wbGUgc2l6ZSAkbiA9IHYgKyB1ICsgMSA9IDM5ICsgNiArIDEgPSA0NiQsIGkuZS4sIHRvIGFjaGlldmUgYSBwb3dlciBvZiA4MCUgYW5kIGJlIGFibGUgdG8gZGV0ZWN0IGEgbGFyZ2UgZWZmZWN0IHNpemUsIGEgc2FtcGxlIHNpemUgb2YgNDYgaXMgbmVlZGVkLg0KDQoNCiMjIEJhbGFuY2VkIEFOT1ZBDQoNCkFOT1ZBIHdoZXJlIGVhY2ggZ3JvdXAgaGFzIHRoZSBzYW1lIG51bWJlciBvZiBzYW1wbGVzLCBpLmUuLCBfYmFsYW5jZWRfLg0KDQpOdWxsIGh5cG90aGVzaXMgaXMgdGhhdCB0aGUgbWVhbnMgb2YgZWFjaCBncm91cCBhcmUgYWxsIHRoZSBzYW1lLg0KDQpBbHRlcm5hdGl2ZSBoeXBvdGhlc2lzIGlzIHRoYXQgdGhlIG1lYW4gb2YgYXQgbGVhc3Qgb25lIGdyb3VwIGlzIHNpZ25pZmljYW50bHkgZGlmZmVyZW50Lg0KDQokSF8wOiBcbXVfMSA9IFxtdV8yID0gXGRvdHMgPSBcbXVfayQNCg0KJEhfQTogXHRleHRybXthdCBsZWFzdCBvbmV9XDsgXG11X2lcOyBcdGV4dHJte2lzIGRpZmZlcmVudCBmcm9tIHRoZSBvdGhlcnN9JA0KDQoNCmBgYHtyfQ0KIyBJZiB3ZSB3YW50IHRvIGRldGVjdCBldmVuIGEgc21hbGwgZGlmZmVyZW5jZQ0KY29oZW4uRVModGVzdCA9ICJhbm92Iiwgc2l6ZSA9ICJzbWFsbCIpDQpgYGANCg0KVGhlcmVmb3JlIHdlIGhhdmUgDQoNCi0gJGsgPSAzJCBncm91cHMsDQotICRmID0gMC4xJCAoc21hbGwgZWZmZWN0IHNpemUpDQotIHNpZ25pZmljYW5jZSBsZXZlbCBvZiAkXGFscGhhID0gNVwlJCwgYW5kDQotIHBvd2VyIG9mICQxIC0gXGJldGEgPSAwLjgkLiANCg0KDQpgYGB7cn0NCnB3ci5hbm92YS50ZXN0KGsgPSAzLCANCiAgICAgICAgICAgICAgIGYgPSAwLjEsIA0KICAgICAgICAgICAgICAgc2lnLmxldmVsID0gMC4wNSwgDQogICAgICAgICAgICAgICBwb3dlciA9IDAuOCkNCmBgYA0KDQpUaGVyZWZvcmUgdG8gaGF2ZSA4MCUgcG93ZXIgYW5kIGJlIGFibGUgdG8gZGV0ZWN0IGEgc21hbGwgZGlmZmVyZW5jZSBpbiBlZmZlY3RzIGJldHdlZW4gZ3JvdXBzLCAzMjMgc2FtcGxlcyBhcmUgbmVlZGVkIGluIGVhY2ggZ3JvdXAuIFRoYXQgbWFrZXMgYSB0b3RhbCBvZiA5Njkgc2FtcGxlcyEgTGFyZ2UgbnVtYmVycyBvZiBzYW1wbGVzIGFyZSBuZWVkZWQgaWYgeW91IHdhbnQgdG8gZGV0ZWN0IHNtYWxsIGVmZmVjdHMgcmVsaWFibHkuDQoNCg0KIyMgVHdvLXNhbXBsZSB0LVRlc3QNCg0KRm9yIGEgdHdvLXNhbXBsZSB0LXRlc3Qgd2hlcmUgZWFjaCBncm91cCBoYXMgdGhlIHNhbWUgbnVtYmVyIG9mIHNhbXBsZXMsIHRoZSBudWxsIGh5cG90aGVzaXMgaXMgdGhhdCB0aGUgbWVhbnMgb2YgYm90aCBncm91cHMgYXJlIGFsbCB0aGUgc2FtZS4NCg0KVGhlIGFsdGVybmF0aXZlIGh5cG90aGVzaXMgaXMgdGhhdCB0aGUgbWVhbiBvZiBncm91cCAyIGlzIGxhcmdlci4NCg0KJEhfMDogXG11XzEgPSBcbXVfMiQNCg0KJEhfQTogXG11XzEgPCBcbXVfMiQNCg0KDQpgYGB7cn0NCiMgTG9va2luZyBmb3IgYSBsYXJnZSBlZmZlY3Qgc2l6ZQ0KcHdyLnQudGVzdChkID0gY29oZW4uRVModGVzdCA9ICJ0Iiwgc2l6ZSA9ICJsYXJnZSIpJGVmZmVjdC5zaXplLCANCiAgICAgICAgICAgcG93ZXIgPSAwLjgwLCANCiAgICAgICAgICAgc2lnLmxldmVsID0gMC4wNSwgDQogICAgICAgICAgIGFsdGVybmF0aXZlID0gImdyZWF0ZXIiKQ0KYGBgDQoNClRoZSByZXF1aXJlZCBzYW1wbGUgc2l6ZSBpcyAkbiA9IDIxIFx0aW1lcyAyID0gNDIkLg0KDQoNCmBgYHtyfQ0KIyBDb21wYXJlIHJlc3VsdCB3aXRoIGJ1aWx0LWluIFIgZnVuY3Rpb24NCnBvd2VyLnQudGVzdChuID0gMjAsIA0KICAgICAgICAgICAgIHNkID0gMSwgDQogICAgICAgICAgICAgc2lnLmxldmVsID0gMC4wNSwgDQogICAgICAgICAgICAgcG93ZXIgPSAwLjgsIA0KICAgICAgICAgICAgIGFsdGVybmF0aXZlID0gIm9uZSIpDQpgYGANCg0KV29ya2luZyBiYWNrd2FyZHMgZnJvbSBzYW1wbGUgc2l6ZSwgd2Ugc2VlIHRoYXQgdGhlIGBwb3dlci50LnRlc3QoKWAgcmV0dXJucyBhIHNpbWlsYXIgZWZmZWN0IHNpemUgZXN0aW1hdGUgYXMgdGhlIGBwd3JgIGZ1bmN0aW9uLg0KDQpbXnB3cl06IFtgcHdyYF0oaHR0cHM6Ly9jcmFuLnItcHJvamVjdC5vcmcvd2ViL3BhY2thZ2VzL3B3ci8pIHBhY2thZ2UNCg0KW15jb2hlbl06IENvaGVuLCBKLiAoMTk4OCkuIFN0YXRpc3RpY2FsIHBvd2VyIGFuYWx5c2lzIGZvciB0aGUgYmVoYXZpb3JhbCBzY2llbmNlcyAoMm5kIGVkLikuIEhpbGxzZGFsZSwgTko6IExhd3JlbmNlIEVybGJhdW0uDQo=</div>
 
 
 </div>
@@ -1919,6 +1940,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
+  window.initializeSourceEmbed("pwr-examples.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

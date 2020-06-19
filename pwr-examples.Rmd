@@ -13,6 +13,7 @@ output:
     theme: readable
     highlight: haddock
     code_folding: show
+    code_download: true
 knit: 
   (function(input_file, encoding) {
     rmarkdown::render(input_file,
